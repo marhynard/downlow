@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@android:id/tabhost"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" 
+        android:background="#EFEFEF">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="0.04" >
+
+                <LinearLayout
+                    android:id="@+id/tab_channel"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" 
+                    android:orientation="vertical"
+                    android:background="#FFFF00" />
+
+                <LinearLayout
+                    android:id="@+id/tab_new"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" 
+                    android:orientation="vertical"
+                    android:background="#FF00FF" />
+             
+                <LinearLayout
+                    android:id="@+id/tab_player"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" 
+                    android:orientation="vertical"
+                    android:background="#F0FFFF" />
+
+                <LinearLayout
+                    android:id="@+id/tab_downloads"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" 
+                    android:orientation="vertical"
+                    android:background="#F0000F" />
+               
+            </FrameLayout>
+
+            <TabWidget
+                android:id="@android:id/tabs"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" >
+            </TabWidget>
+        </LinearLayout>
+
+    </TabHost>

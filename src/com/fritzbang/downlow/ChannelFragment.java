@@ -8,20 +8,22 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.TextView;
 
 public class ChannelFragment extends ListFragment {
-	private static final String DEBUG_TAG = "ChannelActivity";
+	private static final String DEBUG_TAG = "ChannelFragment";
 
 	private String selectedRowId = "-1";
 
-	public void onCreate(Bundle icicle) {
-		super.onCreate(icicle);
-
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
 		// TODO add the refresh and all the other buttons to the channel
 		// activity
 
@@ -29,6 +31,8 @@ public class ChannelFragment extends ListFragment {
 
 		// TODO change getActivity() and us onAttach if needed
 
+		// TODO add this to a thread or task so it is not on the ui thread. use
+		// the on result
 		ArrayList<String> podcastTitles = new ArrayList<String>();
 		ArrayList<String> imageNames = new ArrayList<String>();
 		ArrayList<String> rssIDs = new ArrayList<String>();
@@ -68,31 +72,26 @@ public class ChannelFragment extends ListFragment {
 				imageNames.toArray(new String[podcastTitles.size()]),
 				rssIDs.toArray(new String[podcastTitles.size()])));
 
-		this.getListView().setLongClickable(true);
-		this.getListView().setClickable(true);
-		this.getListView().setOnItemLongClickListener(
-				new OnItemLongClickListener() {
+		getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
 
-					@Override
-					public boolean onItemLongClick(AdapterView<?> parent,
-							View view, int position, long id) {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view,
+					int position, long id) {
 
-						Log.d(DEBUG_TAG, "Item is long clicked:" + id + " "
-								+ position);
-						View parentView = (View) view.getParent();
-						String textview1 = ((TextView) parentView
-								.findViewById(R.id.podcast_title)).getText()
-								.toString();
-						String rowid = (String) ((TextView) parentView
-								.findViewById(R.id.podcast_title)).getTag();
-						Log.d(DEBUG_TAG, "Title: " + textview1 + " : " + rowid);
-						selectedRowId = rowid;
-						showPodcastAlert();
+				Log.d(DEBUG_TAG, "Item is long clicked:" + id + " " + position);
+				View parentView = (View) view.getParent();
+				String textview1 = ((TextView) parentView
+						.findViewById(R.id.podcast_title)).getText().toString();
+				String rowid = (String) ((TextView) parentView
+						.findViewById(R.id.podcast_title)).getTag();
+				Log.d(DEBUG_TAG, "Title: " + textview1 + " : " + rowid);
+				selectedRowId = rowid;
+				showPodcastAlert();
 
-						return true;
-					}
-				});
-		this.getListView().setOnItemClickListener(new OnItemClickListener() {
+				return true;
+			}
+		});
+		getListView().setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -102,6 +101,13 @@ public class ChannelFragment extends ListFragment {
 
 			}
 		});
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+
+		return super.onCreateView(inflater, container, savedInstanceState);
 	}
 
 	public void showPodcastAlert() {

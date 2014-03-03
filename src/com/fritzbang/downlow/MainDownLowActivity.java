@@ -1,16 +1,14 @@
 package com.fritzbang.downlow;
 
-import android.app.TabActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.TabHost;
-import android.widget.TabHost.TabSpec;
 
-public class MainDownLowActivity extends TabActivity {
+public class MainDownLowActivity extends FragmentActivity {
 
 	private static final String DEBUG_TAG = "MainDownLowActivity";
 
@@ -30,51 +28,13 @@ public class MainDownLowActivity extends TabActivity {
 
 	// TODO create a settings menu
 
-	// TODO fix the tab menu so the lettering fits
-	// TODO eliminate the depricated functions ie TabActivity
-	// TODO create the fragment handler and add the various tab activities as
-	// fragments
-	// TODO look at the fragment example in the coursera android course for
-	// help.
-
 	// TODO need to be able to update the views on database change
-	private ChannelFragment mChannelFragment;
-	private NewEpisodeFragment mNewEpisodeFragment;
-	private PlayerFragment mPlayerFragment;
-	private DownloadFragment mDownloadFragment;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main_down_low);
-		// setContentView(R.layout.main_down_low_tabs);
 
-		// Resources resources = getResources();
-		TabHost tabHost = getTabHost();
-
-		Intent intentChannel = new Intent().setClass(this,
-				ChannelActivity.class);
-		TabSpec tabSpecChannel = tabHost.newTabSpec("Channel")
-				.setIndicator("Channel").setContent(intentChannel);
-
-		Intent intentNew = new Intent().setClass(this, NewActivity.class);
-		TabSpec tabSpecNew = tabHost.newTabSpec("New").setIndicator("New")
-				.setContent(intentNew);
-
-		Intent intentPlayer = new Intent().setClass(this, PlayerActivity.class);
-		TabSpec tabSpecPlayer = tabHost.newTabSpec("Player")
-				.setIndicator("Player").setContent(intentPlayer);
-
-		Intent intentDownload = new Intent().setClass(this,
-				DownloadActivity.class);
-		TabSpec tabSpecDownload = tabHost.newTabSpec("Download")
-				.setIndicator("Download").setContent(intentDownload);
-
-		tabHost.addTab(tabSpecChannel);
-		tabHost.addTab(tabSpecNew);
-		tabHost.addTab(tabSpecPlayer);
-		tabHost.addTab(tabSpecDownload);
-		tabHost.setCurrentTab(0);
+		setContentView(R.layout.main_view);
 
 	}
 
