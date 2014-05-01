@@ -1,9 +1,13 @@
 package com.fritzbang.downlow;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+
+import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -22,14 +26,14 @@ import android.widget.Toast;
 public class AddPodcastActivity extends Activity {
 	private static final String DEBUG_TAG = "AddPodcastActivity";
 
-	// TODO add a check to make sure the url doesnt already exist in the
-	// database
+	// TODO fix the view so it matches what the other views are like
 
 	private Button channelButton;
 	// private Button refreshButton;
 
 	private Button subscribeButton;
 	private Button opmlButton;
+	private String opmlFile = "/mnt/sdcard/podkicker_backup.opml";
 
 	String rssURL = null;
 
@@ -48,21 +52,24 @@ public class AddPodcastActivity extends Activity {
 				// rssURL = "http://leo.am/podcasts/sn";
 				// rssURL = "http://192.168.56.101/Coverville.htm";
 				// rssURL = "http://192.168.56.101/songs.htm";
-
+				boolean exists = checkDatabase(rssURL);
 				boolean goodConnection = false;
 				// Check to see if there is a network connection
-				goodConnection = NetworkHandler
-						.checkNetworkConnection(getApplicationContext());
-				if (goodConnection) {
-					new FeedLinkValidationTask().execute(rssURL);
+				if (!exists) {
+					goodConnection = NetworkHandler
+							.checkNetworkConnection(getApplicationContext());
+					if (goodConnection) {
+						new FeedLinkValidationTask().execute(rssURL);
 
-				} else {
-					// If there is no connection let the user know
-					// TODO add a popup to send the user to the settings to
-					// enable it
-					Toast.makeText(getApplicationContext(),
-							"Check Network Connection", Toast.LENGTH_SHORT)
-							.show();
+					} else {
+						// If there is no connection let the user know
+						// TODO add a popup to send the user to the settings to
+						// enable it
+						Log.d(DEBUG_TAG, "Check Network Connection");
+						Toast.makeText(getApplicationContext(),
+								"Check Network Connection", Toast.LENGTH_SHORT)
+								.show();
+					}
 				}
 
 			}
@@ -73,14 +80,49 @@ public class AddPodcastActivity extends Activity {
 
 			@Override
 			public void onClick(View arg0) {
+				Log.d(DEBUG_TAG, "Import button pressed load the opml file");
 				// TODO add file chooser to load file
-				// TODO parse file
-				// TODO check to see it urls are valid
-				// TODO insert into database
+
+				// Log.d(DEBUG_TAG, "parse the OPML file");
 				ArrayList<String> URLs = new ArrayList<String>();
-				for (int x = 0; x < URLs.size(); x++) {
-					String rssURL = (String) URLs.get(x);
-					new FeedLinkValidationTask().execute(rssURL);
+				try {
+					URLs = parseOPML(opmlFile);
+				} catch (XmlPullParserException e) {
+					// Invalid XML please check file
+					Toast.makeText(getApplicationContext(),
+							"Invalid XML please check file", Toast.LENGTH_SHORT)
+							.show();
+				} catch (IOException e) {
+					// File not found Exception
+					Toast.makeText(
+							getApplicationContext(),
+							"Error opening/reading OPML file please check location",
+							Toast.LENGTH_SHORT).show();
+
+				}
+
+				boolean goodConnection = false;
+				// Check to see if there is a network connection
+				goodConnection = NetworkHandler
+						.checkNetworkConnection(getApplicationContext());
+
+				if (goodConnection) {
+					Log.d(DEBUG_TAG, "Check the URLS");
+					for (int x = 0; x < URLs.size(); x++) {
+						String rssURL = (String) URLs.get(x);
+						boolean exists = checkDatabase(rssURL);
+						if (!exists) {
+							new FeedLinkValidationTask().execute(rssURL);
+						}
+					}
+				} else {
+					// If there is no connection let the user know
+					// TODO add a popup to send the user to the settings to
+					// enable it
+					Log.d(DEBUG_TAG, "Check Network Connection");
+					Toast.makeText(getApplicationContext(),
+							"Check Network Connection", Toast.LENGTH_SHORT)
+							.show();
 				}
 			}
 
@@ -112,6 +154,30 @@ public class AddPodcastActivity extends Activity {
 
 		});
 
+		// TODO add recommendations functionality
+		// TODO add search functionality
+
+	}
+
+	protected ArrayList<String> parseOPML(String opmlFile2)
+			throws XmlPullParserException, IOException {
+
+		OPMLHandler opmlHandler = new OPMLHandler();
+		InputStream in = new FileInputStream(opmlFile2);
+		opmlHandler.parse(in);
+		return opmlHandler.getURLs();
+	}
+
+	protected boolean checkDatabase(String rssURL2) {
+		DBAdapter db = new DBAdapter(getApplicationContext());
+		db.open();
+		boolean urlExists = db.verifyURL(rssURL2);
+		db.close();
+		if (urlExists)
+			Log.d(DEBUG_TAG, "The feed exists in the database");
+		else
+			Log.d(DEBUG_TAG, "The feed does not exists in the database");
+		return urlExists;
 	}
 
 	@Override
@@ -151,6 +217,7 @@ public class AddPodcastActivity extends Activity {
 	private class FeedLinkValidationTask extends
 			AsyncTask<String, Void, String> {
 		private int response = -1;
+		private String urlString;
 
 		@Override
 		protected String doInBackground(String... urls) {
@@ -164,8 +231,9 @@ public class AddPodcastActivity extends Activity {
 		// Given a URL, establishes an HttpUrlConnection and retrieves
 		// the web page content as a InputStream, which it returns as
 		// a string.
-		private String verifyUrl(String myurl) throws IOException {
-			URL url = new URL(myurl);
+		private String verifyUrl(String urlString) throws IOException {
+			this.urlString = urlString;
+			URL url = new URL(this.urlString);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setReadTimeout(10000 /* milliseconds */);
 			conn.setConnectTimeout(15000 /* milliseconds */);
@@ -185,15 +253,16 @@ public class AddPodcastActivity extends Activity {
 				// If the page exists the url will be added to the db
 				DBAdapter db = new DBAdapter(getApplicationContext());
 				db.open();
-				db.insertRssLink(rssURL, null, null, null, null, null);
+				db.insertRssLink(urlString, null, null, null, null, null);
 				db.close();
 				Log.d(DEBUG_TAG, "The feed has been added");
 				Toast.makeText(getApplicationContext(),
-						"The feed has been added", Toast.LENGTH_SHORT).show();
+						urlString + " has been added", Toast.LENGTH_SHORT)
+						.show();
 			} else {
-				Log.d(DEBUG_TAG, "The page doesn't exist: " + response);
+				Log.d(DEBUG_TAG, urlString + " doesn't exist: " + response);
 				Toast.makeText(getApplicationContext(),
-						"The page doesn't exist: " + response,
+						urlString + " doesn't exist: " + response,
 						Toast.LENGTH_SHORT).show();
 			}
 

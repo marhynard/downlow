@@ -316,4 +316,15 @@ public class DBAdapter {
 		}
 		return nextInfo;
 	}
+
+	public boolean verifyURL(String rssURL) {
+
+		Cursor cs = db.query(DATABASE_TABLE_RSS_INFO,
+				new String[] { KEY_RSS_LINK }, KEY_RSS_LINK + "=" + "'"
+						+ rssURL + "'", null, null, null, null);
+		if (cs.getCount() > 0)
+			return true;
+
+		return false;
+	}
 }

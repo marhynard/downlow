@@ -21,6 +21,7 @@ public class NewEpisodeFragment extends ListFragment {
 	private String selectedEpisodeLink = "-1";
 
 	// TODO refresh the screen once something has been changed
+	// TODO fix the view so all the information fits on the screen
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {

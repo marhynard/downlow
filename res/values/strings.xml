@@ -9,4 +9,5 @@
     <string name="tab_title_2">New</string>
     <string name="tab_title_3">Player</string>
     <string name="tab_title_4">Download</string>
+    <string name="space_available">used: ? : free: ?</string>
 </resources>

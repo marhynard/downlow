@@ -30,6 +30,9 @@ public class PlayerFragment extends Fragment {
 	// TODO speed up the update
 	// TODO update the view to remove from the playlist
 
+	// TODO create the notification that it is playing
+	// TODO create the big view notification area
+
 	private static final String DEBUG_TAG = "PlayerFragment";
 
 	// This contains the filenames that will be played it may end up being

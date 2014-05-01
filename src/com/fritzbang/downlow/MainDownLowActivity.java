@@ -30,6 +30,8 @@ public class MainDownLowActivity extends FragmentActivity {
 
 	// TODO need to be able to update the views on database change
 
+	// TODO remove all the debug log statements
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

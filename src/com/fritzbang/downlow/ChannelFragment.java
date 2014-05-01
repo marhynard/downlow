@@ -29,7 +29,7 @@ public class ChannelFragment extends ListFragment {
 
 		// TODO refresh the view after deleting podcast
 
-		// TODO change getActivity() and us onAttach if needed
+		// TODO change getActivity() and use onAttach if needed
 
 		// TODO add this to a thread or task so it is not on the ui thread. use
 		// the on result
